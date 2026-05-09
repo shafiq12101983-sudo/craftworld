@@ -111,50 +111,72 @@ def call_cryptomus(endpoint, data, api_key):
 # ═══════════════════════════════════════════
 @app.route('/api/users', methods=['POST'])
 def add_user():
-    name     = request.form.get("name")
-    email    = request.form.get("email")
-    password = request.form.get("password")
-    phone    = request.form.get("phone")
+    # Accepting JSON or Form data
+    data = request.get_json() if request.is_json else request.form
+
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    phone = data.get("phone")
 
     if not name or not email:
-        return jsonify(
-                {"error": "Invalid data"}), 400
+        return jsonify({"error": "Name and Email are required"}), 400
 
-    if User.query.filter_by(
-            email=email).first():
-        return jsonify(
-                {"error": "Email already exists"}
-                ), 409
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "Email already exists"}), 409
 
-    file = request.files.get("image")
-    image_filename = None
-
-    if file and allowed_file(file.filename):
-        filename   = secure_filename(file.filename)
-        image_path = os.path.join(
-                app.config["UPLOAD_FOLDER"],
-                filename)
-        file.save(image_path)
-        image_filename = filename
-    else:
-        return jsonify(
-                {"error": "PNG image required"}
-                ), 400
-
+    # Create user with is_approved=False and no image yet
     user = User(
         name=name,
         email=email,
         password=password,
         phone=phone,
-        image=image_filename
+        is_approved=False
     )
     db.session.add(user)
     db.session.commit()
 
     return jsonify({
-        "message": "User added successfully",
-        "user":    user.to_dict()
+        "message": "Account created. Please verify your identity to enable withdrawals.",
+        "user_id": user.id
     }), 201
+
+
+@app.route('/api/verify', methods=['POST'])
+def verify_user():
+    player_id = request.form.get("player_id")
+
+    if not player_id:
+        return jsonify({"error": "Player ID required"}), 400
+
+    user = User.query.get(player_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Handle multiple files
+    selfie_file = request.files.get("selfie")
+    id_file = request.files.get("id_doc")
+
+    if not selfie_file or not id_file:
+        return jsonify({"error": "Both selfie and ID document are required"}), 400
+
+    if allowed_file(selfie_file.filename) and allowed_file(id_file.filename):
+        # Save Selfie
+        s_filename = secure_filename(f"selfie_{player_id}_{selfie_file.filename}")
+        selfie_file.save(os.path.join(app.config["UPLOAD_FOLDER"], s_filename))
+
+        # Save ID
+        id_filename = secure_filename(f"id_{player_id}_{id_file.filename}")
+        id_file.save(os.path.join(app.config["UPLOAD_FOLDER"], id_filename))
+
+        # Update User Record
+        user.image = s_filename  # Using existing image field for selfie
+        user.id_image = id_filename  # You'll need to add this column to your User model
+        db.session.commit()
+
+        return jsonify({"message": "Verification documents uploaded successfully"}), 200
+
+    return jsonify({"error": "Invalid file format"}), 400
 
 @app.route('/api/users', methods=['GET'])
 def get_users():

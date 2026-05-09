@@ -10,6 +10,7 @@ class User(db.Model):
     password       = db.Column(db.String(100), unique=True, nullable=False)
     phone          = db.Column(db.Integer, nullable=True)
     image          = db.Column(db.String(255))
+    id_image = db.Column(db.String(255))  # New column for the ID path
     is_approved    = db.Column(db.Boolean, default=False)
     usdt_wallet = db.Column(db.String(200),
                             nullable=True)
