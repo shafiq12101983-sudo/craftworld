@@ -109,6 +109,10 @@ def call_cryptomus(endpoint, data, api_key):
 # ═══════════════════════════════════════════
 # USER ROUTES
 # ═══════════════════════════════════════════
+@app.route('/')
+def home():
+    return render_template('home.html')
+
 @app.route('/api/users', methods=['POST'])
 def add_user():
     # Accepting JSON or Form data

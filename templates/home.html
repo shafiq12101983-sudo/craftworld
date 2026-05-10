@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vether | Craft, Stake, Earn</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body { background-color: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: #a855f7;
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -15px rgba(168, 85, 247, 0.15);
+        }
+        .hero-glow {
+            position: absolute;
+            top: -10%; right: -5%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-glow"></div>
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center px-10 py-8 max-w-7xl mx-auto">
+        <h1 class="text-3xl font-black tracking-tighter gradient-text">VETHER</h1>
+        <div class="hidden md:flex space-x-10 text-sm font-medium uppercase tracking-widest text-gray-400">
+            <a href="#craft" class="hover:text-white transition">Craft & Earn</a>
+            <a href="#rules" class="hover:text-white transition">Rules</a>
+            <a href="#staking" class="hover:text-white transition">Staking</a>
+            <a href="#about" class="hover:text-white transition">About</a>
+        </div>
+        <button class="bg-indigo-600 hover:bg-indigo-500 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
+            GET THE APP
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="max-w-7xl mx-auto px-8 py-32 flex flex-col items-center text-center">
+        <div data-aos="zoom-out" class="inline-block px-4 py-1.5 mb-6 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 text-xs font-bold tracking-widest uppercase">
+            v2.0 Beta Live
+        </div>
+        <h2 data-aos="fade-up" class="text-6xl md:text-8xl font-black mb-8 leading-tight">
+            The New Era of <br><span class="gradient-text">Digital Assets.</span>
+        </h2>
+        <p data-aos="fade-up" data-aos-delay="200" class="max-w-2xl text-gray-400 text-lg mb-12">
+            Vether integrates competitive gameplay with real-world value. Mine, trade, and secure your future on a platform built for the next generation.
+        </p>
+        <div data-aos="fade-up" data-aos-delay="400" class="flex gap-6">
+            <a href="#craft" class="bg-white text-black px-10 py-4 rounded-2xl font-bold hover:scale-105 transition">Explore Crafting</a>
+            <a href="#about" class="glass-card px-10 py-4 rounded-2xl font-bold hover:bg-white/5 transition">Learn More</a>
+        </div>
+    </header>
+
+    <!-- NEW: Craft & Earn Section -->
+    <section id="craft" class="max-w-7xl mx-auto px-8 py-24 border-y border-white/5 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+        <div class="flex flex-col md:flex-row items-center gap-16">
+            <div class="flex-1" data-aos="fade-right">
+                <h3 class="text-5xl font-extrabold mb-6 leading-tight">
+                    Craft & <span class="text-indigo-500">Earn</span>
+                </h3>
+                <p class="text-gray-400 text-lg mb-8 leading-relaxed">
+                    Don't just wait—create. Our crafting system allows you to combine base minerals into higher-tier Vether assets. By refining your loot, you increase your conversion rates and unlock exclusive staking pools.
+                </p>
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <i class="fas fa-hammer text-indigo-500 mb-3 block"></i>
+                        <h5 class="font-bold">Forge Assets</h5>
+                        <p class="text-xs text-gray-500 mt-2">Combine Iron and Bronze into Vether essence.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <i class="fas fa-chart-line text-pink-500 mb-3 block"></i>
+                        <h5 class="font-bold">Boost Yield</h5>
+                        <p class="text-xs text-gray-500 mt-2">Crafted items increase your hourly mining power.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 w-full" data-aos="fade-left">
+                <div class="glass-card p-12 rounded-[3rem] text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-indigo-500/10 blur-3xl"></div>
+                    <div class="relative z-10">
+                        <div class="text-6xl mb-6">🛠️</div>
+                        <h4 class="text-2xl font-bold mb-2">Master Crafter Status</h4>
+                        <p class="text-indigo-400 font-mono text-sm">UPGRADE TO REDUCE CONVERSION FEES</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules Section -->
+    <section id="rules" class="max-w-7xl mx-auto px-8 py-32">
+        <div class="text-center mb-20" data-aos="fade-up">
+            <h3 class="text-4xl font-extrabold mb-4">Platform Protocols</h3>
+            <div class="h-1 w-20 bg-indigo-600 mx-auto rounded-full"></div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-10">
+            <div class="glass-card p-10 rounded-3xl" data-aos="fade-up">
+                <div class="text-3xl mb-6"><i class="fas fa-id-card-alt text-indigo-500"></i></div>
+                <h4 class="text-xl font-bold mb-4">Identity Verification</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    To maintain ecosystem integrity, a valid ID and Selfie are required for all withdrawals. This prevents botting and secures your balance.
+                </p>
+            </div>
+            <div class="glass-card p-10 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-3xl mb-6"><i class="fas fa-bolt text-yellow-500"></i></div>
+                <h4 class="text-xl font-bold mb-4">Payout Efficiency</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    Withdrawals are processed via Cryptomus. Your rank determines the Vether-to-USD ratio, starting from 15,000 down to 500.
+                </p>
+            </div>
+            <div class="glass-card p-10 rounded-3xl" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-3xl mb-6"><i class="fas fa-lock text-pink-500"></i></div>
+                <h4 class="text-xl font-bold mb-4">System Spread</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">
+                    A fixed 20% system spread is applied to all liquidations to maintain the Vether liquidity pool and reward long-term holders.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="max-w-4xl mx-auto px-8 py-32 text-center" data-aos="zoom-in">
+        <h3 class="text-3xl font-bold mb-10">Beyond Gaming</h3>
+        <p class="text-gray-400 text-lg leading-loose italic">
+            "Vether was born in 2026 from the idea that player time is the most valuable resource in the digital age. We've built more than a game; we've built a sustainable financial layer for players who value skill, transparency, and growth."
+        </p>
+        <div class="mt-12 flex justify-center gap-10 text-gray-600">
+            <i class="fab fa-python fa-2x"></i>
+            <i class="fab fa-android fa-2x"></i>
+            <i class="fas fa-shield-alt fa-2x"></i>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 text-center border-t border-white/5 text-gray-600 text-xs tracking-widest">
+        <p class="mb-4 uppercase">&copy; 2026 VETHER ECOSYSTEM • POWERED BY CRYPTOMUS</p>
+        <div class="space-x-6">
+            <a href="#" class="hover:text-white transition">PRIVACY</a>
+            <a href="#" class="hover:text-white transition">TERMS</a>
+            <a href="#" class="hover:text-white transition">SECURITY</a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1200,
+            once: true,
+            offset: 100
+        });
+    </script>
+</body>
+</html>
