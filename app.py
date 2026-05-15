@@ -27,9 +27,9 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ── CRYPTOMUS KEYS ──
-MERCHANT_UUID = 'your-merchant-uuid-here'
-PAYMENT_KEY   = 'your-payment-api-key-here'
-PAYOUT_KEY    = 'your-payout-api-key-here'
+MERCHANT_UUID = '91beea2a-7df8-496c-b662-087ee10e5caa'
+PAYMENT_KEY   = '35d7eea1b7e088ee2784ff199af823cdf190fd0b'
+PAYOUT_KEY    = 'sgO0zQzV6jBCH3gJat0JChhAjUZlSm0kZCCBvqRX0JziWUmLC0UqBoI6iO8lsKvw5nDSQesAS8g1m2arnL4VxtB94T1bBelScvmIzIet8MAS6ErRMDel2Q3UUUDpz5Wh'
 
 # ── VETHER CONVERSION ──
 # Vether coins earned per $1 in game
