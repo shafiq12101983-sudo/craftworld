@@ -21,7 +21,7 @@ db.init_app(app)
 # CONFIG
 # ═══════════════════════════════════════════
 UPLOAD_FOLDER      = "uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}git
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
