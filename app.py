@@ -31,7 +31,7 @@ PAYMENT_KEY   = '35d7eea1b7e088ee2784ff199af823cdf190fd0b'
 PAYOUT_KEY    = 'sgO0zQzV6jBCH3gJat0JChhAjUZlSm0kZCCBvqRX0JziWUmLC0UqBoI6iO8lsKvw5nDSQesAS8g1m2arnL4VxtB94T1bBelScvmIzIet8MAS6ErRMDel2Q3UUUDpz5Wh'
 
 # ── RATES ──
-RATE     = 10_000.0  # gold coins per $1 USDT
+RATE     = 15_000.0  # gold coins per $1 USDT
 PKR_RATE = 280.0     # PKR per $1 USDT
 
 # ── VETHER (kept for legacy) ──
