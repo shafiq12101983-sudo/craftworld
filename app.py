@@ -262,6 +262,37 @@ def sync_player(player_id):
         "is_approved":  user.is_approved,
         "username":     user.username,
     }), 200
+@app.route('/api/player/push_gold', methods=['POST'])
+def push_gold():
+    body = request.json
+    if not body:
+        return jsonify({"error": "No data"}), 400
+
+    player_id  = body.get('player_id')
+    gold_coins = body.get('gold_coins')
+
+    if not player_id or gold_coins is None:
+        return jsonify({"error": "Missing fields"}), 400
+
+    try:
+        player_id_int = int(player_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid player ID"}), 400
+
+    user = User.query.filter_by(id=player_id_int).first()
+    if not user:
+        return jsonify({"error": "Player not found"}), 404
+
+    # only update if server has less than local
+    if (user.gold_coins or 0) < int(gold_coins):
+        user.gold_coins = int(gold_coins)
+        db.session.commit()
+        print(f'\nGold pushed: player={player_id_int} gold={gold_coins}')
+
+    return jsonify({
+        "player_id":  player_id_int,
+        "gold_coins": user.gold_coins
+    }), 200
 
 
 # ═══════════════════════════════════════════
@@ -393,6 +424,12 @@ def create_stake():
     currency    = body.get('currency', 'gold')
     amount      = body.get('amount', 0)
     gold_amount = body.get('gold_amount', 0)
+    print(f'\n=== STAKE CREATE ==='
+          f'\nBody: {body}'
+          f'\nplayer_id: {player_id}'
+          f'\ncurrency: {currency}'
+          f'\namount: {amount}'
+          f'\ngold_amount: {gold_amount}')
 
     if not player_id:
         return jsonify(
@@ -417,8 +454,9 @@ def create_stake():
     user = User.query.filter_by(
         id=player_id_int).first()
     if not user:
+        print("123")
         return jsonify(
-            {"error": "Player not found"}), 404
+            {"error": "Player   not found"}), 404
 
     if (user.gold_coins or 0) < int(gold_amount):
         return jsonify({
@@ -541,23 +579,27 @@ def claim_stake():
     }), 200
 
 
-@app.route('/api/stake/unstake',
-           methods=['POST'])
+@app.route('/api/stake/unstake', methods=['POST'])
 def unstake():
     body = request.json
     if not body:
-        return jsonify(
-            {"error": "No data"}), 400
+        return jsonify({"error": "No data"}), 400
 
-    player_id = body.get('player_id')
-    stake_id  = body.get('stake_id')
+    player_id   = body.get('player_id')
+    stake_id    = body.get('stake_id')
+    gold_amount = body.get('gold_amount', 0)  # partial amount
 
     try:
         player_id_int = int(player_id)
         stake_id_int  = int(stake_id)
+        gold_amount_int = int(gold_amount)
     except (ValueError, TypeError):
-        return jsonify(
-            {"error": "Invalid IDs"}), 400
+        return jsonify({"error": "Invalid IDs"}), 400
+
+    if gold_amount_int < 15000:
+        return jsonify({
+            "error": "Minimum unstake is 15,000 gold coins ($1 USDT)"
+        }), 400
 
     stake = Stake.query.filter_by(
         id      = stake_id_int,
@@ -565,42 +607,47 @@ def unstake():
         status  = 'active').first()
 
     if not stake:
-        return jsonify(
-            {"error": "Stake not found"}), 404
+        return jsonify({"error": "Stake not found"}), 404
 
     if stake.is_matured():
         return jsonify({
-            "error": "Stake matured — "
-                     "use /claim instead"
+            "error": "Stake matured — use /claim instead"
         }), 400
 
-    user = User.query.filter_by(
-        id=player_id_int).first()
+    if gold_amount_int > stake.gold_amount:
+        return jsonify({
+            "error": "Amount exceeds staked gold"
+        }), 400
+
+    user = User.query.filter_by(id=player_id_int).first()
     if not user:
-        return jsonify(
-            {"error": "Player not found"}), 404
+        return jsonify({"error": "Player not found"}), 404
 
-    gold_to_return = stake.gold_early_payout()
+    gold_to_return = stake.gold_partial_early_payout(gold_amount_int)
 
-    user.gold_coins = (
-        user.gold_coins or 0) \
-        + gold_to_return
+    # deduct from stake
+    stake.gold_amount -= gold_amount_int
+    stake.amount       = round(stake.gold_amount / 15_000.0, 6)
 
-    stake.status = 'cancelled'
+    # cancel if fully unstaked
+    if stake.gold_amount <= 0:
+        stake.status = 'cancelled'
+
+    user.gold_coins = (user.gold_coins or 0) + gold_to_return
     db.session.commit()
 
-    print(f'\nEarly unstake:'
+    print(f'\nPartial unstake:'
           f'\nPlayer: {player_id_int}'
+          f'\nStake: {stake_id_int}'
+          f'\nGold unstaked: {gold_amount_int}'
           f'\nGold returned: {gold_to_return}')
 
     return jsonify({
-        "message":         "Unstaked early",
-        "gold_to_credit":  gold_to_return,
-        "penalty_gold":    stake.gold_amount
-                           - gold_to_return,
-        "early_payout_usdt":
-            stake.early_payout_amount(),
-        "status":          "cancelled"
+        "message":        "Unstaked partially",
+        "gold_to_credit": gold_to_return,
+        "penalty_gold":   gold_amount_int - gold_to_return,
+        "remaining_gold": stake.gold_amount,
+        "status":         stake.status
     }), 200
 
 

@@ -1,61 +1,780 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin Control Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vether | Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, serif; background:#f4f4f4; padding:20px; }
-        table { width:100%; background:white; border-collapse: collapse; }
-        th, td { padding:10px; border:1px solid #ddd; text-align:center; }
-        th { background:#333; color:white; }
-        .approve { background:green; color:white; padding:5px 10px; text-decoration:none; }
-        .delete { background:red; color:white; padding:5px 10px; text-decoration:none; }
-        img { width:50px; height:50px; object-fit:cover; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+        /* ── GRADIENT TEXT ── */
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* ── GLASS CARD ── */
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; }
+        .glass-sm { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; }
+
+        /* ── SIDEBAR ── */
+        #sidebar { width: 240px; min-height: 100vh; background: rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.06); position: fixed; top: 0; left: 0; z-index: 50; display: flex; flex-direction: column; padding: 28px 16px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: #6b7280; margin-bottom: 4px; text-decoration: none; }
+        .nav-item:hover, .nav-item.active { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+        .nav-item i { width: 18px; text-align: center; }
+
+        /* ── MAIN ── */
+        #main { margin-left: 240px; padding: 32px; min-height: 100vh; }
+
+        /* ── SECTIONS ── */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* ── STAT CARD ── */
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px 24px; }
+
+        /* ── TABLE ── */
+        .vtable { width: 100%; border-collapse: collapse; }
+        .vtable th { background: rgba(255,255,255,0.04); color: #6b7280; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .vtable td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 13px; vertical-align: middle; }
+        .vtable tr:last-child td { border-bottom: none; }
+        .vtable tr:hover td { background: rgba(255,255,255,0.02); }
+        .table-wrap { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; overflow: hidden; }
+
+        /* ── BADGES ── */
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+        .badge-green { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+        .badge-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+        .badge-red { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+        .badge-blue { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(129,140,248,0.2); }
+        .badge-purple { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.2); }
+
+        /* ── BUTTONS ── */
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; }
+        .btn-green { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+        .btn-green:hover { background: rgba(16,185,129,0.3); }
+        .btn-red { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+        .btn-red:hover { background: rgba(239,68,68,0.25); }
+        .btn-indigo { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(165,180,252,0.2); }
+        .btn-indigo:hover { background: rgba(99,102,241,0.3); }
+        .btn-orange { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(251,146,60,0.2); }
+        .btn-orange:hover { background: rgba(249,115,22,0.25); }
+        .btn-gray { background: rgba(255,255,255,0.05); color: #9ca3af; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-gray:hover { background: rgba(255,255,255,0.1); }
+
+        /* ── MODAL ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: #0d1117; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 28px; max-width: 680px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative; }
+        .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+        /* ── AVATAR ── */
+        .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#a855f7); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+
+        /* ── SEARCH ── */
+        .search-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 9px 14px 9px 38px; color: #f3f4f6; font-size: 14px; width: 260px; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: rgba(99,102,241,0.5); }
+        .search-wrap { position: relative; }
+        .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 14px; }
+
+        /* ── IMG PREVIEW ── */
+        .id-img { width: 100%; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: opacity 0.2s; }
+        .id-img:hover { opacity: 0.85; }
+
+        /* ── SCROLL ── */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+
+        /* ── GLOW ── */
+        .hero-glow { position: fixed; top: -5%; right: -5%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+
+        /* ── FORM ── */
+        .form-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 9px 13px; color: #f3f4f6; font-size: 13px; outline: none; }
+        .form-input:focus { border-color: rgba(99,102,241,0.4); }
+        label { font-size: 12px; color: #6b7280; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 5px; }
+
+        /* ── TOAST ── */
+        #toast { position: fixed; bottom: 28px; right: 28px; background: rgba(16,185,129,0.15); border: 1px solid rgba(52,211,153,0.3); color: #34d399; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+
+        .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 20px 0; }
+
+        /* pending dot */
+        .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
     </style>
 </head>
 <body>
 
-<h2>Admin Control Panel</h2>
+<div class="hero-glow"></div>
+<div id="toast"></div>
 
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Image</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside id="sidebar">
+    <div style="margin-bottom:32px; padding: 0 6px;">
+        <h1 class="text-2xl font-black tracking-tighter gradient-text">VETHER</h1>
+        <p style="font-size:11px; color:#374151; letter-spacing:0.1em; margin-top:2px;">ADMIN CONTROL</p>
+    </div>
 
-    {% for user in users %}
-    <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.phone }}</td>
-        <td>
-            {% if user.image %}
-                <img src="{{ url_for('uploaded_file', filename=user.image) }}">
-            {% endif %}
-        </td>
-        <td>
-            {% if user.is_approved %}
-                Approved
-            {% else %}
-                Pending
-            {% endif %}
-        </td>
-        <td>
-            {% if not user.is_approved %}
-                <a class="approve" href="/approve/{{ user.id }}">Approve</a>
-            {% endif %}
-            <a class="delete" href="/delete/{{ user.id }}">Delete</a>
-        </td>
-    </tr>
-    {% endfor %}
+    <nav style="flex:1;">
+        <a class="nav-item active" onclick="showSection('dashboard')" href="#">
+            <i class="fas fa-th-large"></i> Dashboard
+        </a>
+        <a class="nav-item" onclick="showSection('users')" href="#">
+            <i class="fas fa-users"></i> Users
+            <span id="pending-users-badge" class="badge badge-yellow ml-auto" style="font-size:10px; padding:2px 7px;"></span>
+        </a>
+        <a class="nav-item" onclick="showSection('payments')" href="#">
+            <i class="fas fa-credit-card"></i> Payments
+            <span id="pending-pay-badge" class="badge badge-yellow ml-auto" style="font-size:10px; padding:2px 7px;"></span>
+        </a>
+        <a class="nav-item" onclick="showSection('withdrawals')" href="#">
+            <i class="fas fa-arrow-up-from-bracket"></i> Withdrawals
+            <span id="pending-wd-badge" class="badge badge-yellow ml-auto" style="font-size:10px; padding:2px 7px;"></span>
+        </a>
+        <a class="nav-item" onclick="showSection('stakes')" href="#">
+            <i class="fas fa-lock"></i> Stakes
+        </a>
+    </nav>
 
-</table>
+    <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:16px; margin-top:auto;">
+        <div style="display:flex; align-items:center; gap:10px; padding:0 6px;">
+            <div class="avatar" style="width:30px;height:30px;font-size:11px;">AD</div>
+            <div>
+                <p style="font-size:13px; font-weight:600;">Admin</p>
+                <p style="font-size:11px; color:#6b7280;">vether.io</p>
+            </div>
+        </div>
+    </div>
+</aside>
 
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main id="main">
+
+    <!-- ─── DASHBOARD ─── -->
+    <section id="sec-dashboard" class="section active">
+        <div style="margin-bottom:28px;">
+            <h2 style="font-size:22px; font-weight:800;">Dashboard</h2>
+            <p style="color:#6b7280; font-size:14px; margin-top:4px;">Platform overview</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:28px;" id="stat-grid">
+            <div class="stat-card">
+                <p style="font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;"><i class="fas fa-users" style="margin-right:6px;"></i>Total Users</p>
+                <p style="font-size:28px; font-weight:800;" id="stat-users">—</p>
+            </div>
+            <div class="stat-card">
+                <p style="font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;"><i class="fas fa-check-circle" style="margin-right:6px; color:#34d399;"></i>Approved</p>
+                <p style="font-size:28px; font-weight:800; color:#34d399;" id="stat-approved">—</p>
+            </div>
+            <div class="stat-card">
+                <p style="font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;"><i class="fas fa-clock" style="margin-right:6px; color:#fbbf24;"></i>Pending KYC</p>
+                <p style="font-size:28px; font-weight:800; color:#fbbf24;" id="stat-pending">—</p>
+            </div>
+            <div class="stat-card">
+                <p style="font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;"><i class="fas fa-lock" style="margin-right:6px; color:#818cf8;"></i>Active Stakes</p>
+                <p style="font-size:28px; font-weight:800; color:#818cf8;" id="stat-stakes">—</p>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div>
+                <h3 style="font-size:14px; font-weight:700; margin-bottom:14px; color:#9ca3af; text-transform:uppercase; letter-spacing:0.06em;">Pending Payments</h3>
+                <div class="table-wrap" id="dash-payments-table">
+                    <table class="vtable">
+                        <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Action</th></tr></thead>
+                        <tbody id="dash-pay-body"><tr><td colspan="4" style="text-align:center;color:#6b7280;padding:24px;">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size:14px; font-weight:700; margin-bottom:14px; color:#9ca3af; text-transform:uppercase; letter-spacing:0.06em;">Pending Withdrawals</h3>
+                <div class="table-wrap" id="dash-wd-table">
+                    <table class="vtable">
+                        <thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Action</th></tr></thead>
+                        <tbody id="dash-wd-body"><tr><td colspan="4" style="text-align:center;color:#6b7280;padding:24px;">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── USERS ─── -->
+    <section id="sec-users" class="section">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+            <div>
+                <h2 style="font-size:22px; font-weight:800;">Users</h2>
+                <p style="color:#6b7280; font-size:14px; margin-top:4px;">KYC verification & account management</p>
+            </div>
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input class="search-input" type="text" placeholder="Search users…" oninput="filterUsers(this.value)">
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table class="vtable" id="users-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gold Coins</th>
+                        <th>KYC Status</th>
+                        <th>KYC Docs</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-body">
+                    <tr><td colspan="7" style="text-align:center;color:#6b7280;padding:32px;">Loading users…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ─── PAYMENTS ─── -->
+    <section id="sec-payments" class="section">
+        <div style="margin-bottom:24px;">
+            <h2 style="font-size:22px; font-weight:800;">Payments</h2>
+            <p style="color:#6b7280; font-size:14px; margin-top:4px;">Screenshot payment review</p>
+        </div>
+        <div class="table-wrap">
+            <table class="vtable">
+                <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Gold</th><th>Method</th><th>Screenshot</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="payments-body">
+                    <tr><td colspan="9" style="text-align:center;color:#6b7280;padding:32px;">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ─── WITHDRAWALS ─── -->
+    <section id="sec-withdrawals" class="section">
+        <div style="margin-bottom:24px;">
+            <h2 style="font-size:22px; font-weight:800;">Withdrawals</h2>
+            <p style="color:#6b7280; font-size:14px; margin-top:4px;">Manage withdrawal requests</p>
+        </div>
+        <div class="table-wrap">
+            <table class="vtable">
+                <thead><tr><th>ID</th><th>User</th><th>Gold</th><th>USDT</th><th>PKR</th><th>Method</th><th>Destination</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="withdrawals-body">
+                    <tr><td colspan="10" style="text-align:center;color:#6b7280;padding:32px;">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ─── STAKES ─── -->
+    <section id="sec-stakes" class="section">
+        <div style="margin-bottom:24px;">
+            <h2 style="font-size:22px; font-weight:800;">Stakes</h2>
+            <p style="color:#6b7280; font-size:14px; margin-top:4px;">All active and completed stakes</p>
+        </div>
+        <div class="table-wrap">
+            <table class="vtable">
+                <thead><tr><th>ID</th><th>User</th><th>Gold Staked</th><th>USDT Value</th><th>Payout</th><th>Status</th><th>Matured</th><th>Days Left</th><th>Start</th><th>End</th></tr></thead>
+                <tbody id="stakes-body">
+                    <tr><td colspan="10" style="text-align:center;color:#6b7280;padding:32px;">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<!-- ═══════════════════ KYC MODAL ═══════════════════ -->
+<div class="modal-overlay" id="kyc-modal">
+    <div class="modal">
+        <button onclick="closeModal('kyc-modal')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h3 class="gradient-text">KYC Verification</h3>
+        <div id="kyc-modal-content"></div>
+    </div>
+</div>
+
+<!-- ═══════════════════ SCREENSHOT MODAL ═══════════════════ -->
+<div class="modal-overlay" id="screenshot-modal">
+    <div class="modal" style="max-width:420px;">
+        <button onclick="closeModal('screenshot-modal')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h3 style="margin-bottom:16px;">Payment Screenshot</h3>
+        <img id="screenshot-img" src="" style="width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+    </div>
+</div>
+
+<!-- ═══════════════════ NOTE MODAL (withdrawal complete) ═══════════════════ -->
+<div class="modal-overlay" id="note-modal">
+    <div class="modal" style="max-width:400px;">
+        <button onclick="closeModal('note-modal')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;"><i class="fas fa-times"></i></button>
+        <h3 style="margin-bottom:16px;" id="note-modal-title">Add Note</h3>
+        <label>Note (optional)</label>
+        <textarea id="note-input" class="form-input" rows="3" style="resize:none;" placeholder="e.g. TX hash, reason for rejection…"></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-gray" onclick="closeModal('note-modal')" style="flex:1;">Cancel</button>
+            <button class="btn" id="note-confirm-btn" style="flex:1;"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let allUsers = [];
+let allPayments = [];
+let allWithdrawals = [];
+let allStakes = [];
+let currentSection = 'dashboard';
+
+// Pending note action
+let noteAction = null;
+let noteWithdrawId = null;
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+    currentSection = name;
+
+    if (name === 'users') renderUsers(allUsers);
+    if (name === 'payments') renderPayments(allPayments);
+    if (name === 'withdrawals') renderWithdrawals(allWithdrawals);
+    if (name === 'stakes') loadStakes();
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg, type='green') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = type === 'green' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
+    t.style.color = type === 'green' ? '#34d399' : '#f87171';
+    t.style.borderColor = type === 'green' ? 'rgba(52,211,153,0.3)' : 'rgba(248,113,113,0.3)';
+    t.style.opacity = '1';
+    setTimeout(() => t.style.opacity = '0', 2800);
+}
+
+// ═══════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+// FORMAT HELPERS
+// ═══════════════════════════════════════════
+function fmtCoins(n) {
+    if (!n && n !== 0) return '—';
+    if (n >= 1_000_000) return (n/1_000_000).toFixed(2) + 'M';
+    if (n >= 1_000) return (n/1_000).toFixed(1) + 'K';
+    return n.toString();
+}
+function fmtDate(s) {
+    if (!s) return '—';
+    return new Date(s).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+}
+function initials(name) {
+    if (!name) return '?';
+    return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+function statusBadge(status) {
+    const map = {
+        active: 'badge-blue', completed: 'badge-green', cancelled: 'badge-red',
+        pending: 'badge-yellow', approved: 'badge-green', rejected: 'badge-red',
+        processing: 'badge-purple'
+    };
+    return `<span class="badge ${map[status]||'badge-blue'}">${status}</span>`;
+}
+
+// ═══════════════════════════════════════════
+// FETCH WRAPPERS
+// ═══════════════════════════════════════════
+async function fetchJSON(url) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+}
+async function postJSON(url, data) {
+    const r = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    });
+    return r.json();
+}
+async function postForm(url) {
+    const r = await fetch(url, { method:'POST' });
+    return r.ok;
+}
+
+// ═══════════════════════════════════════════
+// LOAD ALL DATA
+// ═══════════════════════════════════════════
+async function loadAll() {
+    try {
+        const [usersData, paysData, wdsData] = await Promise.all([
+            fetchJSON('/api/users'),
+            fetchJSON('/admin/pending_payments'),
+            fetchJSON('/admin/pending_withdrawals')
+        ]);
+
+        allUsers = usersData || [];
+        allPayments = (paysData.payments || []);
+        allWithdrawals = (wdsData.withdrawals || []);
+
+        updateBadges();
+        updateStats();
+        renderDashboard();
+    } catch(e) {
+        console.error('Load error', e);
+    }
+}
+
+async function loadStakes() {
+    const tbody = document.getElementById('stakes-body');
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#6b7280;padding:32px;">Loading…</td></tr>';
+    try {
+        // Fetch stakes for each user
+        const rows = [];
+        for (const u of allUsers) {
+            try {
+                const d = await fetchJSON('/api/stake/list/' + u.id);
+                if (d.stakes) d.stakes.forEach(s => rows.push({...s, userName: u.name}));
+            } catch(e) {}
+        }
+        allStakes = rows;
+        renderStakes(rows);
+    } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#f87171;padding:32px;">Failed to load stakes</td></tr>';
+    }
+}
+
+// ═══════════════════════════════════════════
+// BADGES & STATS
+// ═══════════════════════════════════════════
+function updateBadges() {
+    const pendingKyc = allUsers.filter(u => !u.is_approved).length;
+    const pendingPay = allPayments.length;
+    const pendingWd  = allWithdrawals.length;
+
+    setBadge('pending-users-badge', pendingKyc);
+    setBadge('pending-pay-badge',   pendingPay);
+    setBadge('pending-wd-badge',    pendingWd);
+}
+function setBadge(id, n) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n > 0 ? n : '';
+    el.style.display = n > 0 ? '' : 'none';
+}
+function updateStats() {
+    document.getElementById('stat-users').textContent    = allUsers.length;
+    document.getElementById('stat-approved').textContent = allUsers.filter(u=>u.is_approved).length;
+    document.getElementById('stat-pending').textContent  = allUsers.filter(u=>!u.is_approved).length;
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD RENDER
+// ═══════════════════════════════════════════
+function renderDashboard() {
+    const payBody = document.getElementById('dash-pay-body');
+    const wdBody  = document.getElementById('dash-wd-body');
+
+    if (allPayments.length === 0) {
+        payBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6b7280;padding:20px;">No pending payments</td></tr>';
+    } else {
+        payBody.innerHTML = allPayments.slice(0,5).map(p => {
+            const u = allUsers.find(u=>u.id===p.user_id);
+            return `<tr>
+                <td><div style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar" style="width:26px;height:26px;font-size:10px;">${initials(u?.name||'?')}</div>
+                    <span style="font-size:12px;">${u?.name||'#'+p.user_id}</span>
+                </div></td>
+                <td style="color:#34d399;font-weight:600;">$${p.amount_usd}</td>
+                <td><span class="badge badge-blue">${p.payment_method}</span></td>
+                <td><form method="post" action="/admin/approve_payment/${p.id}" style="display:inline;">
+                    <button class="btn btn-green" style="padding:4px 10px;font-size:11px;">✓ Approve</button>
+                </form></td>
+            </tr>`;
+        }).join('');
+    }
+
+    if (allWithdrawals.length === 0) {
+        wdBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6b7280;padding:20px;">No pending withdrawals</td></tr>';
+    } else {
+        wdBody.innerHTML = allWithdrawals.slice(0,5).map(w => {
+            const u = allUsers.find(u=>u.id===w.user_id);
+            return `<tr>
+                <td><div style="display:flex;align-items:center;gap:8px;">
+                    <div class="avatar" style="width:26px;height:26px;font-size:10px;">${initials(u?.name||'?')}</div>
+                    <span style="font-size:12px;">${u?.name||'#'+w.user_id}</span>
+                </div></td>
+                <td style="color:#fbbf24;font-weight:600;">$${w.usdt_amount}</td>
+                <td><span class="badge badge-purple">${w.method}</span></td>
+                <td><button class="btn btn-green" style="padding:4px 10px;font-size:11px;" onclick="openNoteModal('complete',${w.id})">✓ Done</button></td>
+            </tr>`;
+        }).join('');
+    }
+}
+
+// ═══════════════════════════════════════════
+// USERS RENDER
+// ═══════════════════════════════════════════
+function renderUsers(users) {
+    const tbody = document.getElementById('users-body');
+    if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6b7280;padding:32px;">No users found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = users.map(u => {
+        const kyc = u.is_approved
+            ? '<span class="badge badge-green"><i class="fas fa-check" style="font-size:9px;"></i> Verified</span>'
+            : '<span class="badge badge-yellow"><i class="fas fa-clock" style="font-size:9px;"></i> Pending</span>';
+
+        const docs = (u.image || u.id_image)
+            ? `<button class="btn btn-indigo" style="padding:4px 10px;font-size:11px;" onclick="openKycModal(${u.id})">
+                <i class="fas fa-eye"></i> View KYC
+               </button>`
+            : `<span style="color:#4b5563;font-size:12px;">No docs</span>`;
+
+        const actions = [];
+        if (!u.is_approved) {
+            actions.push(`<form method="post" action="/approve/${u.id}" style="display:inline;">
+                <button class="btn btn-green" style="padding:5px 11px;font-size:11px;">✓ Approve</button>
+            </form>`);
+        }
+        actions.push(`<form method="post" action="/delete/${u.id}" style="display:inline;" onsubmit="return confirm('Delete user ${u.name}?')">
+            <button class="btn btn-red" style="padding:5px 11px;font-size:11px;"><i class="fas fa-trash"></i></button>
+        </form>`);
+
+        return `<tr data-name="${(u.name||'').toLowerCase()}" data-email="${(u.email||'').toLowerCase()}">
+            <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar">${initials(u.name)}</div>
+                <div><p style="font-weight:600;font-size:13px;">${u.name||'—'}</p>
+                <p style="color:#6b7280;font-size:11px;">#${u.id}</p></div>
+            </div></td>
+            <td style="color:#9ca3af;font-size:12px;">${u.email||'—'}</td>
+            <td style="color:#9ca3af;font-size:12px;">${u.phone||'—'}</td>
+            <td style="font-weight:600;color:#fbbf24;">${fmtCoins(u.gold_coins)}</td>
+            <td>${kyc}</td>
+            <td>${docs}</td>
+            <td><div style="display:flex;gap:6px;flex-wrap:wrap;">${actions.join('')}</div></td>
+        </tr>`;
+    }).join('');
+}
+
+function filterUsers(q) {
+    const rows = document.querySelectorAll('#users-body tr[data-name]');
+    rows.forEach(r => {
+        const match = r.dataset.name.includes(q.toLowerCase()) || r.dataset.email.includes(q.toLowerCase());
+        r.style.display = match ? '' : 'none';
+    });
+}
+
+// ═══════════════════════════════════════════
+// KYC MODAL
+// ═══════════════════════════════════════════
+function openKycModal(userId) {
+    const u = allUsers.find(u => u.id === userId);
+    if (!u) return;
+
+    const imgBox = (label, fname) => fname
+        ? `<div>
+            <p style="font-size:11px;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em;">${label}</p>
+            <img src="/uploads/${fname}" class="id-img" onclick="window.open('/uploads/${fname}','_blank')">
+           </div>`
+        : `<div style="background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:10px;padding:32px;text-align:center;color:#4b5563;">
+            <i class="fas fa-image" style="font-size:24px;margin-bottom:8px;display:block;"></i>No ${label}
+           </div>`;
+
+    document.getElementById('kyc-modal-content').innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div class="avatar" style="width:44px;height:44px;font-size:16px;">${initials(u.name)}</div>
+            <div>
+                <p style="font-weight:700;font-size:16px;">${u.name}</p>
+                <p style="color:#6b7280;font-size:13px;">${u.email} · #${u.id}</p>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            ${imgBox('Selfie / Profile', u.image)}
+            ${imgBox('ID Document', u.id_image)}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            ${!u.is_approved ? `
+            <form method="post" action="/approve/${u.id}">
+                <button class="btn btn-green" style="width:100%;justify-content:center;padding:10px;">
+                    <i class="fas fa-check-circle"></i> Approve KYC
+                </button>
+            </form>` : `<div class="badge badge-green" style="justify-content:center;padding:10px;border-radius:8px;">
+                <i class="fas fa-check-circle"></i> Already Verified
+            </div>`}
+            <form method="post" action="/delete/${u.id}" onsubmit="return confirm('Delete ${u.name}?')">
+                <button class="btn btn-red" style="width:100%;justify-content:center;padding:10px;">
+                    <i class="fas fa-trash"></i> Delete User
+                </button>
+            </form>
+        </div>
+    `;
+    openModal('kyc-modal');
+}
+
+// ═══════════════════════════════════════════
+// PAYMENTS RENDER
+// ═══════════════════════════════════════════
+function renderPayments(payments) {
+    const tbody = document.getElementById('payments-body');
+    if (payments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#6b7280;padding:32px;">No pending payments</td></tr>';
+        return;
+    }
+    tbody.innerHTML = payments.map(p => {
+        const u = allUsers.find(u=>u.id===p.user_id);
+        return `<tr>
+            <td style="color:#6b7280;font-size:12px;">#${p.id}</td>
+            <td><div style="display:flex;align-items:center;gap:8px;">
+                <div class="avatar" style="width:26px;height:26px;font-size:10px;">${initials(u?.name||'?')}</div>
+                <span style="font-size:13px;">${u?.name||'#'+p.user_id}</span>
+            </div></td>
+            <td style="color:#34d399;font-weight:700;">$${p.amount_usd}</td>
+            <td style="color:#fbbf24;">${fmtCoins(p.gold_coins)}</td>
+            <td><span class="badge badge-blue">${p.payment_method}</span></td>
+            <td>
+                ${p.screenshot
+                    ? `<button class="btn btn-indigo" style="padding:4px 10px;font-size:11px;" onclick="openScreenshot('/uploads/${p.screenshot}')">
+                        <i class="fas fa-image"></i> View
+                       </button>`
+                    : '<span style="color:#4b5563;font-size:12px;">—</span>'}
+            </td>
+            <td style="color:#6b7280;font-size:12px;">${fmtDate(p.created_at)}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <form method="post" action="/admin/approve_payment/${p.id}" style="display:inline;">
+                        <button class="btn btn-green" style="padding:5px 10px;font-size:11px;">✓ Approve</button>
+                    </form>
+                    <form method="post" action="/admin/reject_payment/${p.id}" style="display:inline;" onsubmit="return confirm('Reject this payment?')">
+                        <button class="btn btn-red" style="padding:5px 10px;font-size:11px;">✗ Reject</button>
+                    </form>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function openScreenshot(url) {
+    document.getElementById('screenshot-img').src = url;
+    openModal('screenshot-modal');
+}
+
+// ═══════════════════════════════════════════
+// WITHDRAWALS RENDER
+// ═══════════════════════════════════════════
+function renderWithdrawals(withdrawals) {
+    const tbody = document.getElementById('withdrawals-body');
+    if (withdrawals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#6b7280;padding:32px;">No pending withdrawals</td></tr>';
+        return;
+    }
+    tbody.innerHTML = withdrawals.map(w => {
+        const u = allUsers.find(u=>u.id===w.user_id);
+        const dest = w.destination && w.destination.length > 16
+            ? w.destination.slice(0,8)+'…'+w.destination.slice(-6)
+            : (w.destination||'—');
+        return `<tr>
+            <td style="color:#6b7280;font-size:12px;">#${w.id}</td>
+            <td><div style="display:flex;align-items:center;gap:8px;">
+                <div class="avatar" style="width:26px;height:26px;font-size:10px;">${initials(u?.name||'?')}</div>
+                <span style="font-size:13px;">${u?.name||'#'+w.user_id}</span>
+            </div></td>
+            <td style="color:#fbbf24;font-weight:600;">${fmtCoins(w.gold_amount)}</td>
+            <td style="color:#34d399;font-weight:700;">$${w.usdt_amount}</td>
+            <td style="color:#9ca3af;">${w.pkr_amount ? 'Rs '+w.pkr_amount : '—'}</td>
+            <td><span class="badge badge-purple">${w.method}</span></td>
+            <td style="font-family:monospace;font-size:11px;color:#9ca3af;" title="${w.destination}">${dest}</td>
+            <td style="color:#6b7280;font-size:12px;">${fmtDate(w.created_at)}</td>
+            <td>${statusBadge(w.status)}</td>
+            <td>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn btn-green" style="padding:5px 10px;font-size:11px;" onclick="openNoteModal('complete',${w.id})">✓ Complete</button>
+                    <button class="btn btn-red" style="padding:5px 10px;font-size:11px;" onclick="openNoteModal('reject',${w.id})">✗ Reject</button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════
+// NOTE MODAL (withdrawal)
+// ═══════════════════════════════════════════
+function openNoteModal(action, wdId) {
+    noteAction = action;
+    noteWithdrawId = wdId;
+    const isComplete = action === 'complete';
+    document.getElementById('note-modal-title').textContent = isComplete ? 'Complete Withdrawal' : 'Reject Withdrawal';
+    const btn = document.getElementById('note-confirm-btn');
+    btn.textContent = isComplete ? '✓ Confirm Complete' : '✗ Confirm Reject';
+    btn.className = 'btn ' + (isComplete ? 'btn-green' : 'btn-red');
+    btn.onclick = submitNoteAction;
+    document.getElementById('note-input').value = '';
+    openModal('note-modal');
+}
+
+function submitNoteAction() {
+    if (!noteWithdrawId) return;
+    const note = document.getElementById('note-input').value;
+    const url = noteAction === 'complete'
+        ? `/admin/complete_withdrawal/${noteWithdrawId}`
+        : `/admin/reject_withdrawal/${noteWithdrawId}`;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.name = 'note'; inp.value = note;
+    form.appendChild(inp);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// ═══════════════════════════════════════════
+// STAKES RENDER
+// ═══════════════════════════════════════════
+function renderStakes(stakes) {
+    const tbody = document.getElementById('stakes-body');
+    document.getElementById('stat-stakes').textContent = stakes.filter(s=>s.status==='active').length;
+
+    if (stakes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#6b7280;padding:32px;">No stakes found</td></tr>';
+        return;
+    }
+    tbody.innerHTML = stakes.map(s => {
+        const matured = s.is_matured
+            ? '<span class="badge badge-green">Yes</span>'
+            : '<span class="badge badge-yellow">No</span>';
+        return `<tr>
+            <td style="color:#6b7280;font-size:12px;">#${s.id}</td>
+            <td style="font-size:13px;">${s.userName||'#'+s.user_id}</td>
+            <td style="color:#fbbf24;font-weight:600;">${fmtCoins(s.gold_amount)}</td>
+            <td style="color:#34d399;">$${s.amount?.toFixed(4)||'—'}</td>
+            <td style="color:#818cf8;">${fmtCoins(s.gold_payout)}</td>
+            <td>${statusBadge(s.status)}</td>
+            <td>${matured}</td>
+            <td style="color:#9ca3af;font-size:12px;">${s.days_remaining ?? '—'}d</td>
+            <td style="color:#6b7280;font-size:12px;">${fmtDate(s.start_time)}</td>
+            <td style="color:#6b7280;font-size:12px;">${fmtDate(s.end_time)}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadAll();
+</script>
 </body>
 </html>

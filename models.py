@@ -89,6 +89,9 @@ class Stake(db.Model):
     def gold_payout(self):
         return int(self.gold_amount * (1 + self.profit_rate))
 
+    def gold_partial_early_payout(self, partial_gold):
+        return int(partial_gold * (1 - self.penalty_rate))
+
     def gold_early_payout(self):
         return int(self.gold_amount * (1 - self.penalty_rate))
 
